@@ -1,55 +1,51 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as faceapi from 'face-api.js';
-import './CameraCapture.css'
-import { ClipLoader } from 'react-spinners';
-import { loadFaceApiModels } from '../../utils/faceApiLoader';
+import React, { useEffect, useRef, useState } from "react";
+import * as faceapi from "face-api.js";
+import "./CameraCapture.css";
+import { ClipLoader } from "react-spinners";
+import { loadFaceApiModels } from "../../utils/faceApiLoader";
 
-const CameraCapture:React.FC = () => {
-
+const CameraCapture: React.FC = () => {
   //variables
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const [status, setStatus] = useState<string>('');
+  const [status, setStatus] = useState<string>("");
 
   //references
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  
-
   //model loading
   useEffect(() => {
-    loadFaceApiModels().then(()=>{
+    loadFaceApiModels().then(() => {
       startCamera();
       setLoading(false);
-    }
-    );
+    });
   }, []);
 
   //camera
   const startCamera = () => {
-    console.log("Starting camera")
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
+    console.log("Starting camera");
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
         if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+          videoRef.current.srcObject = stream;
         }
         detectFace();
-    })
-    .catch(error => {
-        console.error('Camera error:', error);
+      })
+      .catch((error) => {
+        console.error("Camera error:", error);
         setError(true);
-    });
+      });
   };
 
-  
   useEffect(() => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
     if (!canvas || !video) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const draw = () => {
@@ -59,23 +55,23 @@ const CameraCapture:React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Rysujemy szary półprzezroczysty overlay na cały obszar
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Parametry okręgu (środek i promień)
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const radiusX = canvas.width * 0.25;  // promień poziomy (szerokość)
-      const radiusY = canvas.height * 0.40; // promień pionowy (wysokość)
+      const radiusX = canvas.width * 0.25; // promień poziomy (szerokość)
+      const radiusY = canvas.height * 0.4; // promień pionowy (wysokość)
 
       // Tworzymy maskę: wycinamy koło ze szarego tła (przezroczysty okrąg)
-      ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalCompositeOperation = "destination-out";
       ctx.beginPath();
       ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
       ctx.fill();
 
       // Przywracamy normalny tryb rysowania
-      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalCompositeOperation = "source-over";
 
       requestAnimationFrame(draw);
     };
@@ -93,7 +89,11 @@ const CameraCapture:React.FC = () => {
 
   //detection
   const detectFace = async () => {
-    if (!videoRef.current || videoRef.current.readyState !== 4 || !canvasRef.current) {
+    if (
+      !videoRef.current ||
+      videoRef.current.readyState !== 4 ||
+      !canvasRef.current
+    ) {
       // jeśli video nie jest gotowe, spróbuj za chwilę
       setTimeout(detectFace, 500);
       return;
@@ -107,19 +107,24 @@ const CameraCapture:React.FC = () => {
     // Dopasuj rozmiar canvas do video
     faceapi.matchDimensions(canvas, {
       width: video.videoWidth,
-      height: video.videoHeight
+      height: video.videoHeight,
     });
 
     // Pętla detekcji
     const runDetection = async () => {
-      if (!videoRef.current || videoRef.current.paused || videoRef.current.ended) return;
+      if (
+        !videoRef.current ||
+        videoRef.current.paused ||
+        videoRef.current.ended
+      )
+        return;
 
       // const tempCanvas = document.createElement('canvas');
       // const tempCtx = tempCanvas.getContext('2d');
 
       // const centerX = canvas.width / 2;
       // const centerY = canvas.height / 2;
-      // const radiusX = canvas.width * 0.35;  
+      // const radiusX = canvas.width * 0.35;
       // const radiusY = canvas.height * 0.50;
 
       // // Ustaw rozmiar tymczasowego canvas zgodnie z obszarem detekcji
@@ -130,33 +135,52 @@ const CameraCapture:React.FC = () => {
 
       // // Wytnij prostokąt z video (obraz wideo, x, y, szerokość, wysokość)
       // tempCtx!.drawImage(
-      //   video, 
+      //   video,
       //   centerX - radiusX, centerY - radiusY, width, height,  // źródło (z video)
       //   0, 0, width, height                                   // docelowo na tempCanvas
       // );
-
+      //console.log("Running detection...");
       const detections = await faceapi.detectSingleFace(video, options);
       //.withFaceLandmarks();
-
+      //console.log("Detections:", detections);
       if (detections) {
-        setStatus('Face detected! Checking liveness...');
+        const landmarksResult = await faceapi.detectFaceLandmarks(video);
+        // Handle both array and single object cases
+        const landmarks = Array.isArray(landmarksResult)
+          ? landmarksResult[0]
+          : landmarksResult;
+        if (landmarks) {
+          setStatus("Face detected! Checking liveness...");
 
-        // const resizedDetections = faceapi.resizeResults(detections, {
-        //   width: video.videoWidth,
-        //   height: video.videoHeight
-        // });
+          const leftEye = landmarks.getLeftEye();
+          const rightEye = landmarks.getRightEye();
 
-        // // Wyczyść canvas i narysuj box
-        // const ctx = canvas.getContext('2d');
-        // ctx!.clearRect(0, 0, canvas.width, canvas.height);
-        // faceapi.draw.drawDetections(canvas, resizedDetections);
+          function euclideanDistance(p1: faceapi.Point, p2: faceapi.Point) {
+            return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          }
+          function getEAR(eye: faceapi.Point[]) {
+            const a = euclideanDistance(eye[1], eye[5]);
+            const b = euclideanDistance(eye[2], eye[4]);
+            const c = euclideanDistance(eye[0], eye[3]);
+            return (a + b) / (2.0 * c);
+          }
 
-        // Tu możesz dodać detekcję mrugania i logikę żywotności
-        // Na potrzeby przykładu zrobimy prostą symulację:
-        //await checkLiveness(video);
+          const leftEAR = getEAR(leftEye);
+          const rightEAR = getEAR(rightEye);
+          const ear = (leftEAR + rightEAR) / 2;
 
+          if (ear < 0.2) {
+            setStatus("Liveness check passed! You can proceed.");
+          } else {
+            setStatus("Liveness check failed. Please blink your eyes.");
+          }
+        } else {
+          setStatus("Face detected, but no landmarks found.");
+        }
       } else {
-        setStatus('No face detected. Please position your face in front of the camera.');
+        setStatus(
+          "No face detected. Please position your face in front of the camera."
+        );
       }
 
       requestAnimationFrame(runDetection);
@@ -165,10 +189,8 @@ const CameraCapture:React.FC = () => {
     runDetection();
   };
 
-
-
   return (
-   <div className='camera-container'>
+    <div className="camera-container">
       {loading ? (
         <div className="loading-wrapper">
           <ClipLoader color="#36d7b7" size={50} />
@@ -178,15 +200,20 @@ const CameraCapture:React.FC = () => {
       ) : (
         <>
           <div className="video-wrapper">
-            <video ref={videoRef} autoPlay muted playsInline className="face-capture-video" />
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              className="face-capture-video"
+            />
             <canvas ref={canvasRef} className="face-capture-canvas" />
           </div>
           <div className="face-capture-status">{status}</div>
         </>
-      )}  
+      )}
     </div>
-
-  )
-}
+  );
+};
 
 export default CameraCapture;
