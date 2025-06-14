@@ -17,8 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+import partners_management
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('recognition.urls')),
-
+    path('api/private/', include('recognition.urls')),
+    path('api/public/authorization/', include('partners_integration.urls')),
+    path('api/public/apps/', include('partners_management.urls'))
 ]

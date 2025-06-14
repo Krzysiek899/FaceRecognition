@@ -1,9 +1,8 @@
 # recognition/management/commands/add_face.py
 from django.core.management.base import BaseCommand
-from backend.recognition.models  import FaceProfile
+from recognition.models  import FaceProfile
 import face_recognition
-import numpy as np
-from PIL import Image
+
 
 class Command(BaseCommand):
     help = "Add face to database"
