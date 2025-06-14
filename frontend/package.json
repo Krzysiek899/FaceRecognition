@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^24.0.1"
+  },
+  "dependencies": {
+    "react-spinners": "^0.17.0"
   }
 }

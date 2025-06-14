@@ -1,4 +1,4 @@
-.face-capture-container {
+/* .face-capture-container {
   padding: 1rem;
   max-width: 600px;
   margin: 0 auto;
@@ -44,7 +44,7 @@
 .face-capture-button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #2563eb; /* Tailwind blue-600 */
+  background-color: #2563eb; 
   color: white;
   border: none;
   border-radius: 4px;
@@ -52,11 +52,11 @@
 }
 
 .face-capture-button:hover {
-  background-color: #1e40af; /* Tailwind blue-800 */
+  background-color: #1e40af; 
 }
 
 .face-capture-status {
   margin-top: 0.5rem;
   font-size: 0.9rem;
   color: #333;
-}
+} */

@@ -1,0 +1,43 @@
+.camera-container{
+    background-color: black;
+    /* max-width: 1000px; */
+    /* width: 800px; */
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+.face-capture-video {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.face-capture-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+
+.loading-wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.face-capture-status{
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
