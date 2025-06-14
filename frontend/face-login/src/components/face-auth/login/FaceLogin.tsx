@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { redirect, useLocation } from 'react-router-dom';
 import CameraCapture from '../CameraCapture';
 import '../authPanels.css';
+import type { AuthPayload, LoginResponse } from '../../../models/models';
+import { FaceAuthService } from '../../../services/FaceAuthService';
+
+interface LoginPayload {
+  user_id: string;
+  client_id: string;
+
+}
 
 const FaceLogin: React.FC = () => {
 
@@ -14,12 +22,30 @@ const FaceLogin: React.FC = () => {
   const userId = queryParams.get('userId') || '';
   const callbackUrl = queryParams.get('callback_url') || '';
 
+  const handleReceiveImage = (faceImage: Blob) => {
+
+    const payload : AuthPayload = {
+      client_id: clientId,
+      user_id: userId,
+      image: faceImage
+    }
+
+    FaceAuthService.loginWithImage(payload).then((response: LoginResponse) => {
+      if (response.status == "success") {
+        setMessage("Login successful!");
+        redirect(callbackUrl);
+      } else {
+        setMessage("Login unsuccessfull. Try again.")
+      }
+    })
+  }
+
   return (
     <div className='window-container'>
       <div className="content">
         <h1 className='title'>Face Login</h1>
         <div className='camera'>
-          <CameraCapture></CameraCapture>
+          <CameraCapture onSendImage={handleReceiveImage}></CameraCapture>
         </div>
         <div className='success-message'>{message}</div>
       </div>

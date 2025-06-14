@@ -4,7 +4,11 @@ import './CameraCapture.css'
 import { ClipLoader } from 'react-spinners';
 import { loadFaceApiModels } from '../../utils/faceApiLoader';
 
-const CameraCapture:React.FC = () => {
+interface CameraProps {
+  onSendImage: (image: Blob) => void;
+}
+
+const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
 
   //variables
   const [loading, setLoading] = useState<boolean>(true);

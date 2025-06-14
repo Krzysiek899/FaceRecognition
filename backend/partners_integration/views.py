@@ -52,7 +52,7 @@ class PartnerLoginView(APIView):
         except Partner.DoesNotExist:
             return Response({"error": "Invalid clientId"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_exists = FaceUser.objects.filter(partner=partner, email=user_id).exists()
+        user_exists = FaceUser.objects.filter(partner=partner, id=user_id).exists()
         if not user_exists:
             return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
