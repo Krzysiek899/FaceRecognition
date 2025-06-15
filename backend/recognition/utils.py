@@ -1,4 +1,5 @@
 import secrets
+import uuid
 from datetime import timedelta
 
 from jwt import encode
@@ -28,7 +29,8 @@ def generate_jwt(user_id, user_name, partner_id, expires_at):
         'partner_id': str(partner_id),
         'user_name': str(user_name),
         'exp': int(expires_at.timestamp()),
-        'iat': int(timezone.now().timestamp())
+        'iat': int(timezone.now().timestamp()),
+        'jti': str(uuid.uuid4())
     }
     return encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 

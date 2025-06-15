@@ -1,17 +1,16 @@
 .container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 2rem auto;
   padding: 1.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid #333;
   border-radius: 8px;
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
+  background-color: #1e1e1e;
 }
 
 h2 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .form {
@@ -27,28 +26,30 @@ label {
   font-weight: 600;
   margin-bottom: 0.3rem;
   display: block;
-  color: #555;
+  color: #cccccc;
 }
 
 .input {
-  width: 100%;
+  width: 80%;
   padding: 0.5rem 0.6rem;
-  border: 1px solid #bbb;
+  border: 1px solid #555;
   border-radius: 4px;
   font-size: 1rem;
   box-sizing: border-box;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
 }
 
 .input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 3px rgba(0,123,255,0.5);
+  border-color: #1e90ff;
+  box-shadow: 0 0 3px rgba(30,144,255,0.5);
 }
 
 .btn {
   padding: 0.6rem 1rem;
   font-size: 1rem;
-  background-color: #007bff;
+  background-color: #1e90ff;
   color: white;
   border: none;
   border-radius: 4px;
@@ -58,26 +59,27 @@ label {
 }
 
 .btn:hover {
-  background-color: #0056b3;
+  background-color: #0d6efd;
 }
 
 .message {
   margin-top: 1rem;
-  color: #2a7a2a;
+  color: #4caf50;
   font-weight: 600;
 }
 
 .app-info {
   margin-top: 1.5rem;
   padding: 1rem;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #2c2c2c;
+  border: 1px solid #444;
   border-radius: 6px;
-  color: #222;
+  color: #cccccc;
 }
 
 .app-info-title {
   font-weight: 700;
   margin-bottom: 0.8rem;
   font-size: 1.1rem;
+  color: #ffffff;
 }

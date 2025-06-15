@@ -4,17 +4,21 @@ import CameraCapture from '../CameraCapture';
 import '../authPanels.css';
 import type { AuthPayload, RegisterResponse } from '../../../models/models';
 import { FaceAuthService } from '../../../services/FaceAuthService';
+import AuthForm from '../AuthForm';
 
 const FaceRegister: React.FC = () => {
 
   const [message, setMessage] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [formCompleted, setFormCompleted] = useState<boolean>(false); 
 
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const clientId = queryParams.get('clientId') || '';
-  const userName = queryParams.get('userName') || '';
-  const callbackUrl = queryParams.get('callback_url') || '';
+  // const userName = queryParams.get('userName') || '';
+  const callbackUrl = queryParams.get('callbackUrl') || '';
 
   const handleReceiveImage = async (imageUrl: string) => {
 
@@ -27,23 +31,45 @@ const FaceRegister: React.FC = () => {
     }
 
     FaceAuthService.registerWithImage(payload).then((response: RegisterResponse) => {
-      if (response.status == "registered") {
         setMessage("Registration successful!");
-        window.location.href = callbackUrl;
-      } else {
-        setMessage("Error: " + response.error);
-      }
-    })
+        const redirectUrl = new URL(callbackUrl);
+        redirectUrl.searchParams.set('status', "success");
+
+        setTimeout(() => {
+            window.location.href = redirectUrl.toString();
+        }, 2000);
+    }).catch( (error) => {
+      setMessage("Error: " + error.message);
+      const redirectUrl = new URL(callbackUrl);
+      redirectUrl.searchParams.set('status', "fail");
+
+      setTimeout(() => {
+            window.location.href = redirectUrl.toString();
+        }, 2000);
+    }
+
+    )
+  }
+
+  const handleFormCompletion = (data: { name: string; email: string }) => {
+    setUserName(data.name);
+    setEmail(data.email);
+    setFormCompleted(true);
   }
 
 
   return (
     <div className='window-container'>
+
       <div className="content">
         <h1 className='title'>Face Registration: {userName}</h1>
-        <div className='camera'>
-          <CameraCapture onSendImage={handleReceiveImage} ></CameraCapture>
-        </div>
+        {!formCompleted ? (
+          <AuthForm onComplete={handleFormCompletion}  />
+        ) : (
+          <div className='camera'>
+            <CameraCapture onSendImage={handleReceiveImage} />
+          </div>
+        )}
         <div className='success-message'>{message}</div>
       </div>
     </div>

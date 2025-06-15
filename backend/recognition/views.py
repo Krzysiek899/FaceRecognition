@@ -36,13 +36,13 @@ class FaceLoginView(APIView):
         try:
             partner = Partner.objects.get(client_id=client_id)
         except Partner.DoesNotExist:
-            return Response({"status": "fail", "message": "Partner not found"}, status=404)
+            return Response({"error": "Partner not found"}, status=404)
 
         # Znajdź użytkownika partnera po emailu
         try:
             user = FaceUser.objects.get(partner=partner, name=user_name)
         except FaceUser.DoesNotExist:
-            return Response({"status": "fail", "message": "User not found for this partner"}, status=404)
+            return Response({"error": "This user doesn't exists!"}, status=404)
 
         # Dekoduj face_embedding z base64 do numpy array
         try:
@@ -55,9 +55,9 @@ class FaceLoginView(APIView):
         match = face_recognition.compare_faces([known_encoding], input_encoding, tolerance=0.45)
 
         if match[0]:
-            return Response({"status": "success", "code": generate_authorization_code(user, partner).code}, status=200)
+            return Response({ "code": generate_authorization_code(user, partner).code}, status=200)
         else:
-            return Response({"status": "fail", "message": "Face does not match the user"}, status=401)
+            return Response({ "error": "Face does not match the user"}, status=401)
 
 
 class FaceRegisterView(APIView):
@@ -101,5 +101,5 @@ class FaceRegisterView(APIView):
             face_embedding=encoding_b64
         )
 
-        return Response({"status": "registered", user_name: user_name,
+        return Response({ "user_name": user_name,
                          "client_id": client_id}, status=201)

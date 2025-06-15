@@ -16,8 +16,16 @@ export const FaceAuthService = {
         });
 
         if (!response.ok) {
-            throw new Error(`Upload failed: ${response.status}`);
+        let errorMsg = `Upload failed: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            if (errorData.error) {
+                errorMsg = errorData.error;
+            }
+        } catch {
         }
+        throw new Error(errorMsg);
+    }
 
         return await response.json();
     },
@@ -36,8 +44,16 @@ export const FaceAuthService = {
         });
 
         if (!response.ok) {
-            throw new Error(`Upload failed: ${response.status}`);
+        let errorMsg = `Upload failed: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            if (errorData.error) {
+                errorMsg = errorData.error;
+            }
+        } catch {
         }
+        throw new Error(errorMsg);
+    }
 
         return await response.json();
     }

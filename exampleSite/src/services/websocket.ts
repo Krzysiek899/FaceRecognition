@@ -1,0 +1,1 @@
+//Komunikacja WebSocket (kamera -> backend)
