@@ -11,8 +11,9 @@ class Partner(models.Model):
 class FaceUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name='users')
+    name = models.CharField(max_length=100)
     email = models.EmailField()
     face_embedding = models.TextField()
 
     class Meta:
-        unique_together = ('partner', 'email')
+        unique_together = ('partner', 'name')

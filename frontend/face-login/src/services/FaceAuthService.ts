@@ -6,11 +6,11 @@ export const FaceAuthService = {
         const formData = new FormData();
         formData.append('image', payload.image, 'face.png');
         formData.append('client_id', payload.client_id);
-        formData.append('user_id', payload.user_id);
+        formData.append('user_name', payload.user_name);
         
         const backendUrl = 'http://localhost:8000/';
 
-        const response = await fetch(backendUrl + 'api/private/face-register', {
+        const response = await fetch(backendUrl + 'api/private/face-register/', {
             method: 'POST',
             body: formData,
         });
@@ -26,11 +26,11 @@ export const FaceAuthService = {
         const formData = new FormData();
         formData.append('image', payload.image, 'face.png');
         formData.append('client_id', payload.client_id);
-        formData.append('user_id', payload.user_id);
+        formData.append('user_name', payload.user_name);
 
         const backendUrl = 'http://localhost:8000/';
 
-        const response = await fetch(backendUrl + 'api/private/face-login', {
+        const response = await fetch(backendUrl + 'api/private/face-login/', {
             method: 'POST',
             body: formData,
         });

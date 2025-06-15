@@ -14,24 +14,24 @@ from backend.settings import FRONTEND_URL
 # Create your views here.
 
 class PartnerRegistrationView(APIView):
-    def post(self, request):
-        client_id = request.data.get('clientId')
-        user_id = request.data.get('userId')
-        callback_url = request.data.get('callback_url')
+    def get(self, request):
+        client_id = request.GET.get('clientId')
+        user_name = request.GET.get('userName')
+        callback_url = request.GET.get('callbackUrl')
 
-        if not all([client_id, user_id, callback_url]):
-            return Response({"error": "clientId, userId and callback_url are required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([client_id, user_name, callback_url]):
+            return Response({"error": "clientId, userName and callbackUrl are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             partner = Partner.objects.get(client_id=client_id)
         except Partner.DoesNotExist:
             return Response({"error": "Invalid clientId"}, status=status.HTTP_400_BAD_REQUEST)
 
-        frontend_path = "/face-register"
+        frontend_path = "face-register"
         params = {
             "clientId": client_id,
-            "userId": user_id,
-            "callback_url": callback_url,
+            "userName": user_name,
+            "callbackUrl": callback_url,
         }
 
         url = f"{FRONTEND_URL}{frontend_path}?{urlencode(params)}"
@@ -41,25 +41,25 @@ class PartnerRegistrationView(APIView):
 class PartnerLoginView(APIView):
     def get(self, request):
         client_id = request.query_params.get('clientId')
-        user_id = request.query_params.get('userId')
-        callback_url = request.query_params.get('callback_url')
+        user_name = request.query_params.get('userName')
+        callback_url = request.query_params.get('callbackUrl')
 
-        if not all([client_id, user_id, callback_url]):
-            return Response({"error": "clientId, userId and callback_url are required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([client_id, user_name, callback_url]):
+            return Response({"error": "clientId, userName and callbackUrl are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             partner = Partner.objects.get(client_id=client_id)
         except Partner.DoesNotExist:
             return Response({"error": "Invalid clientId"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_exists = FaceUser.objects.filter(partner=partner, id=user_id).exists()
+        user_exists = FaceUser.objects.filter(partner=partner, name=user_name).exists()
         if not user_exists:
             return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        frontend_path = "/face-login"
+        frontend_path = "face-login"
         params = {
             "clientId": client_id,
-            "userId": user_id,
+            "userName": user_name,
             "callback_url": callback_url,
         }
         url = f"{FRONTEND_URL}{frontend_path}?{urlencode(params)}"

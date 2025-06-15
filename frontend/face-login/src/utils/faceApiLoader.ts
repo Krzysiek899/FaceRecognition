@@ -5,7 +5,7 @@ let loaded = false;
 
 export const loadFaceApiModels = async () => {
   if (loaded) return;
-  await tf.setBackend("webgl"); // lub "cpu" jeśli webgl nie działa
+  await tf.setBackend("cpu"); // lub "cpu" jeśli webgl nie działa
   await tf.ready();
   const MODEL_URL = "/models";
   await Promise.all([

@@ -5,7 +5,7 @@ import { ClipLoader } from "react-spinners";
 import { loadFaceApiModels } from "../../utils/faceApiLoader";
 
 interface CameraProps {
-  onSendImage: (image: Blob) => void;
+  onSendImage: (imageUrl: string) => void;
 }
 
 const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
@@ -18,6 +18,9 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
   //references
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationIdRef = useRef<number | null>(null);
+  const detectionIdRef = useRef<number | null>(null);
+
 
   //model loading
   useEffect(() => {
@@ -78,7 +81,7 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
       // Przywracamy normalny tryb rysowania
       ctx.globalCompositeOperation = "source-over";
 
-      requestAnimationFrame(draw);
+      animationIdRef.current = requestAnimationFrame(draw);
     };
 
     if (video.readyState >= 2) {
@@ -88,8 +91,12 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
     }
 
     return () => {
+      if (animationIdRef.current !== null) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
       if (video) video.onloadeddata = null;
     };
+
   }, [loading]);
 
   //detection
@@ -149,13 +156,13 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
       //.withFaceLandmarks();
       //console.log("Detections:", detections);
       if (detections) {
+        setStatus("Face detected! Checking liveness...");
         const landmarksResult = await faceapi.detectFaceLandmarks(video);
         // Handle both array and single object cases
         const landmarks = Array.isArray(landmarksResult)
           ? landmarksResult[0]
           : landmarksResult;
         if (landmarks) {
-          setStatus("Face detected! Checking liveness...");
 
           const leftEye = landmarks.getLeftEye();
           const rightEye = landmarks.getRightEye();
@@ -173,9 +180,14 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
           const leftEAR = getEAR(leftEye);
           const rightEAR = getEAR(rightEye);
           const ear = (leftEAR + rightEAR) / 2;
+          console.log(ear);
 
-          if (ear < 0.2) {
+          if (ear < 0.9) {
             setStatus("Liveness check passed! You can proceed.");
+            const imageUrl = getSnapshot(videoRef.current);
+            onSendImage(imageUrl);
+            setStatus("Face scan finished! Recognizing.")
+            stopVideoProcessing();
           } else {
             setStatus("Liveness check failed. Please blink your eyes.");
           }
@@ -188,11 +200,44 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
         );
       }
 
-      requestAnimationFrame(runDetection);
+      detectionIdRef.current = requestAnimationFrame(runDetection);
     };
 
     runDetection();
   };
+
+  const getSnapshot = (video: HTMLVideoElement): string => {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }
+    return canvas.toDataURL('image/jpeg');
+  };
+
+  const stopVideoProcessing = () => {
+    if (animationIdRef.current !== null) {
+      cancelAnimationFrame(animationIdRef.current);
+      animationIdRef.current = null;
+    }
+    if (detectionIdRef.current !== null) {
+      cancelAnimationFrame(detectionIdRef.current);
+      detectionIdRef.current = null;
+    }
+
+    // Zatrzymaj kamerę
+    const stream = videoRef.current?.srcObject as MediaStream | null;
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current!.srcObject = null;
+    }
+
+    console.log("Video and processing stopped.");
+  };
+
+
 
   return (
     <div className="camera-container">

@@ -5,12 +5,6 @@ import '../authPanels.css';
 import type { AuthPayload, LoginResponse } from '../../../models/models';
 import { FaceAuthService } from '../../../services/FaceAuthService';
 
-interface LoginPayload {
-  user_id: string;
-  client_id: string;
-
-}
-
 const FaceLogin: React.FC = () => {
 
   const [message, setMessage] = useState<string>('');
@@ -19,21 +13,23 @@ const FaceLogin: React.FC = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const clientId = queryParams.get('clientId') || '';
-  const userId = queryParams.get('userId') || '';
+  const userName = queryParams.get('userName') || '';
   const callbackUrl = queryParams.get('callback_url') || '';
 
-  const handleReceiveImage = (faceImage: Blob) => {
+  const handleReceiveImage = async (imageUrl: string) => {
+
+    const faceImage = await (await fetch(imageUrl)).blob();
 
     const payload : AuthPayload = {
       client_id: clientId,
-      user_id: userId,
+      user_name: userName,
       image: faceImage
     }
 
     FaceAuthService.loginWithImage(payload).then((response: LoginResponse) => {
       if (response.status == "success") {
         setMessage("Login successful!");
-        redirect(callbackUrl);
+        window.location.href = callbackUrl;
       } else {
         setMessage("Login unsuccessfull. Try again.")
       }

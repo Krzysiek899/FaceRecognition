@@ -12,12 +12,12 @@ class FaceLoginView(APIView):
     def post(self, request):
         image_file = request.FILES.get('image')
         client_id = request.data.get('client_id')
-        user_id = request.data.get('user_id')
+        user_name = request.data.get('user_name')
 
 
         if not image_file:
             return Response({"error": "No image provided"}, status=400)
-        if not client_id or not user_id:
+        if not client_id or not user_name:
             return Response({"error": "client_id and user_id are required"}, status=400)
 
         # Przetwórz obraz do numpy
@@ -38,7 +38,7 @@ class FaceLoginView(APIView):
 
         # Znajdź użytkownika partnera po emailu
         try:
-            user = FaceUser.objects.get(partner=partner, id=user_id)
+            user = FaceUser.objects.get(partner=partner, name=user_name)
         except FaceUser.DoesNotExist:
             return Response({"status": "fail", "message": "User not found for this partner"}, status=404)
 
@@ -53,7 +53,7 @@ class FaceLoginView(APIView):
         match = face_recognition.compare_faces([known_encoding], input_encoding, tolerance=0.45)
 
         if match[0]:
-            return Response({"status": "success", "message": "Face matches the user"})
+            return Response({"status": "success", "message": "Face matches the user"}, status=200)
         else:
             return Response({"status": "fail", "message": "Face does not match the user"}, status=401)
 
@@ -61,11 +61,11 @@ class FaceLoginView(APIView):
 class FaceRegisterView(APIView):
     def post(self, request):
         client_id = request.data.get("client_id")
-        user_id = request.data.get("user_id")
+        user_name = request.data.get("user_name")
         image_file = request.FILES.get("image")
 
-        if not client_id or not user_id or not image_file:
-            return Response({"error": "Missing client_id, email or image"}, status=400)
+        if not client_id or not user_name or not image_file:
+            return Response({"error": "Missing client_id, user_name or image"}, status=400)
 
         # Znajdź partnera
         try:
@@ -74,7 +74,7 @@ class FaceRegisterView(APIView):
             return Response({"error": "Partner not found"}, status=404)
 
         # Sprawdź czy użytkownik już istnieje dla tego partnera
-        if FaceUser.objects.filter(partner=partner, id=user_id).exists():
+        if FaceUser.objects.filter(partner=partner, name=user_name).exists():
             return Response({"error": "User already registered for this partner"}, status=400)
 
         # Przetwórz obraz
@@ -95,8 +95,9 @@ class FaceRegisterView(APIView):
         FaceUser.objects.create(
             partner=partner,
             # email=email,
+            name=user_name,
             face_embedding=encoding_b64
         )
 
-        return Response({"status": "registered", #"email": email,
-                         "client_id": client_id})
+        return Response({"status": "registered", user_name: user_name,
+                         "client_id": client_id}, status=201)

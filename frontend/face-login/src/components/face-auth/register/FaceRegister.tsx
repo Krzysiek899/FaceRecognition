@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import CameraCapture from '../CameraCapture';
 import '../authPanels.css';
 import type { AuthPayload, RegisterResponse } from '../../../models/models';
@@ -13,23 +13,25 @@ const FaceRegister: React.FC = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const clientId = queryParams.get('clientId') || '';
-  const userId = queryParams.get('userId') || '';
+  const userName = queryParams.get('userName') || '';
   const callbackUrl = queryParams.get('callback_url') || '';
 
-  const handleReceiveImage = (faceImage: Blob) => {
+  const handleReceiveImage = async (imageUrl: string) => {
+
+    const faceImage = await (await fetch(imageUrl)).blob();
 
     const payload : AuthPayload = {
       client_id: clientId,
-      user_id: userId,
+      user_name: userName,
       image: faceImage
     }
 
     FaceAuthService.registerWithImage(payload).then((response: RegisterResponse) => {
       if (response.status == "registered") {
         setMessage("Registration successful!");
-        redirect(callbackUrl);
+        window.location.href = callbackUrl;
       } else {
-        setMessage("Registration unsuccessfull. Try again.")
+        setMessage("Error: " + response.error);
       }
     })
   }

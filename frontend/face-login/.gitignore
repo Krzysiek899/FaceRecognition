@@ -22,3 +22,52 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+.pnp/
+.pnp.js
+
+# Vite cache
+.vite/
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Mac system files
+.DS_Store
+
+# Optional npm cache folder
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional prettier cache
+.prettiercache
+
+# Local environment overrides
+.local/
+
+# Coverage directory
+coverage/
