@@ -12,4 +12,5 @@ export interface RegisterResponse {
 
 export interface LoginResponse {
     status: string,
+    code: string
 }

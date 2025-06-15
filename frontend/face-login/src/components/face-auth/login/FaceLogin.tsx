@@ -29,7 +29,12 @@ const FaceLogin: React.FC = () => {
     FaceAuthService.loginWithImage(payload).then((response: LoginResponse) => {
       if (response.status == "success") {
         setMessage("Login successful!");
-        window.location.href = callbackUrl;
+
+        const code = response.code;
+        const redirectUrl = new URL(callbackUrl);
+        redirectUrl.searchParams.set('code', code);
+
+        window.location.href = redirectUrl.toString();
       } else {
         setMessage("Login unsuccessfull. Try again.")
       }
@@ -39,7 +44,7 @@ const FaceLogin: React.FC = () => {
   return (
     <div className='window-container'>
       <div className="content">
-        <h1 className='title'>Face Login</h1>
+        <h1 className='title'>Face Login: {userName}</h1>
         <div className='camera'>
           <CameraCapture onSendImage={handleReceiveImage}></CameraCapture>
         </div>

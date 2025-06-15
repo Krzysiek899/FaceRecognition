@@ -182,7 +182,7 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
           const ear = (leftEAR + rightEAR) / 2;
           console.log(ear);
 
-          if (ear < 0.9) {
+          if (ear < 0.3) {
             setStatus("Liveness check passed! You can proceed.");
             const imageUrl = getSnapshot(videoRef.current);
             onSendImage(imageUrl);

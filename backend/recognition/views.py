@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from accounts.models import FaceUser, Partner
 from PIL import Image
 
+from recognition.utils import generate_authorization_code
+
 
 class FaceLoginView(APIView):
     def post(self, request):
@@ -53,7 +55,7 @@ class FaceLoginView(APIView):
         match = face_recognition.compare_faces([known_encoding], input_encoding, tolerance=0.45)
 
         if match[0]:
-            return Response({"status": "success", "message": "Face matches the user"}, status=200)
+            return Response({"status": "success", "code": generate_authorization_code(user, partner).code}, status=200)
         else:
             return Response({"status": "fail", "message": "Face does not match the user"}, status=401)
 

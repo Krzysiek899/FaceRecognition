@@ -40,7 +40,7 @@ const FaceRegister: React.FC = () => {
   return (
     <div className='window-container'>
       <div className="content">
-        <h1 className='title'>Face Registration</h1>
+        <h1 className='title'>Face Registration: {userName}</h1>
         <div className='camera'>
           <CameraCapture onSendImage={handleReceiveImage} ></CameraCapture>
         </div>
