@@ -1,15 +1,16 @@
 import './App.css'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import FaceCapture from './components/FaceCapture';
-import FaceLogin from './components/FaceLogin';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Panel from './components/partners-panel/Panel'
+import FaceRegister from './components/face-auth/register/FaceRegister';
+import FaceLogin from './components/face-auth/login/FaceLogin';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/register" />} />
-        <Route path="/register" element={<FaceCapture />} />
-        <Route path="/login" element={<FaceLogin />} />
+        <Route path="/" element={<Panel/>} />
+        <Route path="/face-register" element={<FaceRegister/>} />
+        <Route path="/face-login" element={<FaceLogin />} />
       </Routes>
     </Router>
   );
