@@ -182,12 +182,14 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
           const ear = (leftEAR + rightEAR) / 2;
           console.log(ear);
 
-          if (ear < 0.35) {
+          if (ear < 0.3) {
+            if (checkBlinking(ear)){
             setStatus("Liveness check passed! You can proceed.");
             const imageUrl = getSnapshot(videoRef.current);
             onSendImage(imageUrl);
             setStatus("Face scan finished! Recognizing.")
             stopVideoProcessing();
+            }
           } else {
             setStatus("Liveness check failed. Please blink your eyes.");
           }
@@ -236,6 +238,26 @@ const CameraCapture : React.FC <CameraProps> = ({onSendImage}) => {
 
     console.log("Video and processing stopped.");
   };
+
+let earBelowThresholdFrames = 0;
+const EAR_THRESHOLD = 0.3; 
+const EAR_CONSEC_FRAMES = 5;
+
+function checkBlinking(ear: number) {
+  if (ear < EAR_THRESHOLD) {
+    earBelowThresholdFrames += 1;
+    console.log("Reading below threshold");
+    if (earBelowThresholdFrames >= EAR_CONSEC_FRAMES) {
+      console.log("Blink detected!");
+      return true;
+  }
+} else {
+      earBelowThresholdFrames = 0;
+    console.log("Resetting counter!");
+} 
+  return false;
+}
+
 
 
 

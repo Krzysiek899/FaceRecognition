@@ -45,9 +45,9 @@ const AuthCallbackHandler: React.FC = () => {
           clientSecret: secret,
         });
 
-        const { access_token, user_name } = response.data;
+        const { jwt, user_name } = response.data;
 
-        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('access_token', jwt);
         setIsLoading(false);
         setStatus('You were logged in as ' + user_name);
         setTimeout(() => {
